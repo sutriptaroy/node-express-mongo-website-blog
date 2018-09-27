@@ -1,5 +1,5 @@
 const path = require('path')
-const Post = require('../database/models/Post')
+const Post = require('../../database/models/Post')
 const cloudinary = require('cloudinary')
 
 module.exports = async (req, res) => {

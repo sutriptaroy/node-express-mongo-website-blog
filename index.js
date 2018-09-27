@@ -1,27 +1,3 @@
-// const http = require('http')
-// const fs = require('fs')
-
-// const home = fs.readFileSync('index.html')
-// const about = fs.readFileSync('about.html')
-// const error = fs.readFileSync('404.html')
-
-// const server = http.createServer((req, res) => {
-// 	if(req.url === "/")
-// 	{
-// 		return res.end(home)
-// 	}
-// 	else if(req.url === "/about")
-// 	{
-// 		return res.end(about)
-// 	}
-// 	else
-// 	{
-// 		res.writeHead(404)
-// 		return res.end(error)
-// 	}
-// })
-
-// server.listen(4000)
 
 require('dotenv').config()
 const express = require('express')
@@ -37,17 +13,21 @@ const cloudinary = require('cloudinary')
 
 const app = new express();
 
-const createPostController = require('./controllers/createPost')
+const createPostController = require('./controllers/post/createPost')
 const homePageController = require('./controllers/homePage')
-const storePostController = require('./controllers/storePost')
-const getPostController = require('./controllers/getPost')
-const createUserController = require('./controllers/createUser')
-const storeUserController = require('./controllers/storeUser')
-const loginController = require('./controllers/login')
-const loginUserController = require('./controllers/loginUser')
-const logoutController = require('./controllers/logout')
+const storePostController = require('./controllers/post/storePost')
+const getPostController = require('./controllers/post/getPost')
+const createUserController = require('./controllers/auth/createUser')
+const storeUserController = require('./controllers/auth/storeUser')
+const loginController = require('./controllers/auth/login')
+const loginUserController = require('./controllers/auth/loginUser')
+const logoutController = require('./controllers/auth/logout')
 
-mongoose.connect(process.env.DB_URL, { useNewUrlParser: true })
+mongoose.connect(process.env.DB_URL, { useNewUrlParser: true }).then((res)=>{
+	console.log("Mongo DB Connected")
+},(err)=>{
+	console.log(err);
+})
 
 app.use(connectFlash())
 
@@ -62,8 +42,11 @@ const mongoStore = connectMongo(expressSession)
 app.use(expressSession({
 	secret: process.env.EXPRESS_SESSION_KEY,
 	store: new mongoStore({
-		mongooseConnection: mongoose.connection
-	})
+		mongooseConnection: mongoose.connection,
+		
+	}),
+	resave:true,
+	saveUninitialized: true
 }))
 app.use(fileUpload())
 app.use(express.static('public'))
@@ -82,15 +65,22 @@ const storePost = require('./middleware/storePost')
 const auth = require('./middleware/auth')
 const checkAuth = require('./middleware/checkAuth')
 
+
+const postRoutes=require('./routes/post.route')
+const authRoutes=require('./routes/auth.route')
+
+app.use('/auth',authRoutes);
+app.use('/post',postRoutes);
+
 app.get('/', homePageController)
-app.get('/post/new', auth, createPostController)
-app.post('/posts/store', auth, storePost, storePostController)
-app.get('/post/:id', getPostController)
-app.get('/auth/register', checkAuth, createUserController)
-app.post('/users/register', checkAuth, storeUserController)
-app.get('/auth/login', checkAuth, loginController)
-app.post('/users/login', checkAuth, loginUserController)
-app.get('/auth/logout', auth, logoutController)
+// app.get('/post/new', auth, createPostController)
+// app.post('/posts/store', auth, storePost, storePostController)
+// app.get('/post/:id', getPostController)
+// app.get('/auth/register', checkAuth, createUserController)
+// app.post('/users/register', checkAuth, storeUserController)
+// app.get('/auth/login', checkAuth, loginController)
+// app.post('/users/login', checkAuth, loginUserController)
+// app.get('/auth/logout', auth, logoutController)
 
 app.use((req, res) => res.render('not-found'))
  
