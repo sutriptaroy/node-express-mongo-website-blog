@@ -81,8 +81,6 @@ app.use(bodyParser.urlencoded({extended:true}))
 const storePost = require('./middleware/storePost')
 const auth = require('./middleware/auth')
 const checkAuth = require('./middleware/checkAuth')
-// app.use('/posts/store', storePost);
-// app.use('/posts/new', auth);
 
 app.get('/', homePageController)
 app.get('/post/new', auth, createPostController)
