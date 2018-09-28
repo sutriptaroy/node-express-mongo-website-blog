@@ -1,4 +1,6 @@
 "use strict";
+const bcrypt = require('bcrypt')
+const User = require('../../database/models/User')
 
 function redirectToRegisterPage(req,res,next){
     res.render('register', {

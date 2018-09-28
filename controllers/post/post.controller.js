@@ -1,14 +1,21 @@
 "use strict"
-
 const path = require('path')
 const Post = require('../../database/models/Post')
 const cloudinary = require('cloudinary')
 
 async function getPostById(req,res,next){
-    let post = await Post.findById(req.params.id).populate('author')
-    res.render('post', {
-        post
-    })
+    try 
+    {
+        let post = await Post.findById(req.params.id).populate('author')
+        res.render('post', {
+            post
+        })
+    }
+    catch(e){
+        res.redirect("/");
+    
+    }
+    
 }
 
 function storePosts(req,res,next){
@@ -41,4 +48,22 @@ function redirectToPostCreationPage(req,res,next){
     }
 }
 
-module.exports={getPostById,storePosts,redirectToPostCreationPage}
+async function getPosts(req,res,next){
+    try{
+        let posts = await Post.find({}).populate('author')
+        if(posts!=null && posts!=''){
+            res.render('index', {
+                posts
+            })
+        }
+        else{
+            res.redirect('/')
+        }        
+    }
+    catch(e){
+        res.redirect('/')
+    }
+    
+}
+
+module.exports={getPostById,storePosts,redirectToPostCreationPage,getPosts}

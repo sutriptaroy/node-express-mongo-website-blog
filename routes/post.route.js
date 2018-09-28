@@ -7,5 +7,6 @@ const PostCtrl= require("../controllers/post/post.controller");
 router.route("/new").get(PostCtrl.redirectToPostCreationPage);
 router.route("/:id").get(PostCtrl.getPostById);
 router.route("/store").post(PostCtrl.storePosts);
+router.route("/").get(PostCtrl.getPosts);
 
 module.exports=router
